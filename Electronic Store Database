@@ -1,0 +1,11 @@
+/* Joins tables containing customer information and February sales from an electronics store
+groups product sales information in descending order by product popularity */
+
+SELECT cust.acctnum, count(cust.order_id) as Orders, feb.Product
+FROM BIT_DB.customers cust
+
+INNER JOIN BIT_DB.FebSales feb
+ON cust.order_id=feb.orderid
+
+group by feb.Product
+order by Orders desc
