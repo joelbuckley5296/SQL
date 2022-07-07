@@ -1,0 +1,10 @@
+/*Calculates the bonus of each employee whose ID is odd and whose name does not start with 'M'
+bonus is returned as 100% of salary, or 0 if conditions are not met*/
+
+select employee_id,
+CASE WHEN employee_id%2 = 1 
+AND name NOT LIKE 'M%' THEN salary
+ELSE 0
+END AS bonus
+from employees
+ORDER BY employee_id
