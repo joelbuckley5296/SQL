@@ -1,0 +1,61 @@
+/* This query outlines a data pull of group meals and their attendees for the month of August. 
+This query also utilizes a CTE to pull alcohol spent associated with each meal, using the card transaction number as the unique identifier./*
+
+with alcohol as(
+    select
+        c.card_transaction_number,
+        b.report_id,
+        SUM(b.meal_unallowable_amt) as alcohol_amt
+    from
+        Table 2 as b
+        Table 3 as c on b.reportid = c.reportid
+        
+    where
+        b.expense_type_name = 'Alcohol'
+    group by
+        c.card_transaction_number, b.reportid
+)
+select
+    distinct a.REPORTID,
+    a.EMP_ID as Emp_Number,
+    concat(
+        a.EMP_FIRST_NAME,
+        ' ',
+        coalesce(MIDDLE_INITIAL, ''),
+        ' ',
+        EMP_LAST_NAME
+    ) as Emp_Name,
+    a.REPORTID, 
+    b.EXPENSE_TYPE_NAME,
+    a.PAYMENT_PROCESSING_DATE,
+    b.VENDOR_DESCRIPTION,
+    a.REPORT_NAME,
+    b.meal_allowable_amt,
+    b.meal_unallowable_amt,
+    IFNULL(d.alcohol_amt, 0) as alcohol_amt,
+    IFNULL(b.total_employee_attendee, 0),
+    IFNULL(b.total_business_attendee, 0),
+    IFNULL(b.total_spouse_attendee, 0),
+    a.BUSINESS_PURPOSE as Bus_Purpose,
+    b.meal_type,
+    b.VENDOR_DESCRIPTION as Desc,
+    b.PAYMENT_CODE,
+    b.TRANSACTION_DATE as Expense_Date,
+    c.card_transaction_number,
+    a.business_unit,
+    b.state_province
+from
+    Table 1 as a
+    left join Table 2 as b on a.report_id = b.report_id
+    
+    left join Table 3 as c on b.report_id = c.report_id
+        left join alcohol as d on c.card_transaction_number = d.card_transaction_number
+where
+    a.payment_processing_date between '2023-08-01 00:00:00'
+    and '2023-08-31 00:00:00'
+    and b.EXPENSE_TYPE_NAME = 'Group Meals'
+   
+order by
+    b.report_entry_vendor_description
+
+    
